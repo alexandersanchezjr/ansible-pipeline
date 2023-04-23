@@ -1,6 +1,6 @@
 ---
 - name: Instalar y configurar Nginx
-  hosts: sonar
+  hosts: nginx
   become: true
   tasks:
     - name: Actualizar cache de paquetes
@@ -17,6 +17,8 @@
         name: nginx
         state: started
         enabled: yes
+
+---
 
 - name: Instalar y configurar Jenkins
   hosts: jenkins
