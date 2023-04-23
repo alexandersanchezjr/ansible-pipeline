@@ -1,12 +1,19 @@
 ---
 - name: Instalar y configurar Nginx
-  hosts: jenkins, sonar
-  become: yes
+  hosts: all
+  become: true
   tasks:
-  - name: Install Nginx latest
-    app: name=nginx state=latest
-  
-  - name: Start Nginx Service
-    service:
-      name: nginx
-      state: started 
+    - name: Actualizar cache de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Iniciar servicio Nginx
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
