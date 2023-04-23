@@ -20,6 +20,6 @@ jobs:
       run: pip install -r requirements.txt
 
     - name: Run Ansible playbook
-      run: ansible-playbook ansible-playbook.yml -i ${{ secrets.INVENTORY }} --extra-vars "@${{ secrets.SECRETS_YML }}"
+      run: ansible-playbook playbook.yml -i ${{ secrets.INVENTORY }} --extra-vars "@${{ secrets.SECRETS_YML }}"
       env:
         ANSIBLE_HOST_KEY_CHECKING: false
