@@ -19,7 +19,6 @@
         enabled: yes
 
 ---
-
 - name: Instalar y configurar Jenkins
   hosts: jenkins
   become: true
@@ -27,7 +26,7 @@
     jenkins_apt_key_url: "https://pkg.jenkins.io/debian-stable/jenkins.io.key"
     jenkins_apt_repo_url: "https://pkg.jenkins.io/debian-stable"
     jenkins_http_port: "80"
-    
+
   tasks:
     - name: Agregar llave GPG de Jenkins
       apt_key:
