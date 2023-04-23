@@ -59,3 +59,66 @@
       systemd:
         name: jenkins
         state: restarted
+
+
+- name: Instalar Jenkins en Ubuntu
+  hosts: jenkins
+  become: yes
+  vars:
+    jenkins_hostname: jenkins.example.com
+    jenkins_admin_username: admin
+    jenkins_admin_password: your_password_here
+
+  tasks:
+    - name: Actualizar repositorios
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Instalar dependencias
+      apt:
+        name:
+          - openjdk-11-jdk
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Añadir clave GPG de Jenkins
+      ansible.builtin.apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins.io.key
+        state: present
+
+    - name: Añadir repositorio de Jenkins
+      ansible.builtin.apt_repository:
+        repo: "deb https://pkg.jenkins.io/debian binary/"
+        state: present
+
+    - name: Instalar Jenkins
+      apt:
+        name: jenkins
+        state: present
+      notify:
+        - start jenkins
+  
+    - name: Cambiar puerto de Jenkins
+      lineinfile:
+        path: /etc/default/jenkins
+        regexp: 'HTTP_PORT='
+        line: 'HTTP_PORT={{ jenkins_http_port }}'
+      notify:
+        - restart jenkins
+
+  handlers:
+    - name: start jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: restart jenkins
+      systemd:
+        name: jenkins
+        state: restarted
