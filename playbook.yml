@@ -18,7 +18,6 @@
         state: started
         enabled: yes
 
----
 - name: Instalar y configurar Jenkins
   hosts: jenkins
   become: true
