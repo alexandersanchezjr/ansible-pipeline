@@ -22,7 +22,10 @@ jobs:
     - name: Create inventory
       run: echo "${{ secrets.INVENTORY }}" > inventory
 
+    - name: Create inventory
+      run: echo "${{ secrets.SECRETS_YML }}" > secrets.yml
+
     - name: Run Ansible playbook
-      run: ansible-playbook playbook.yml -i inventory --extra-vars "@${{ secrets.SECRETS_YML }}"
+      run: ansible-playbook playbook.yml -i inventory --extra-vars "@secrets.yml"
       env:
         ANSIBLE_HOST_KEY_CHECKING: false
