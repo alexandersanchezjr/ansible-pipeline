@@ -1,0 +1,12 @@
+---
+- name: Instalar y configurar Nginx
+  hosts: jenkins, sonar
+  become: yes
+  tasks:
+  - name: Install Nginx latest
+    app: name=nginx state=latest
+  
+  - name: Start Nginx Service
+    service:
+      name: nginx
+      state: started 
