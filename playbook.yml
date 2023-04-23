@@ -26,6 +26,8 @@
   vars:
     jenkins_apt_key_url: "https://pkg.jenkins.io/debian-stable/jenkins.io.key"
     jenkins_apt_repo_url: "https://pkg.jenkins.io/debian-stable"
+    jenkins_http_port: "80"
+    
   tasks:
     - name: Agregar llave GPG de Jenkins
       apt_key:
@@ -49,3 +51,17 @@
         name: jenkins
         state: started
         enabled: yes
+    
+    - name: Cambiar puerto de Jenkins
+      lineinfile:
+        path: /etc/default/jenkins
+        regexp: 'HTTP_PORT='
+        line: 'HTTP_PORT={{ jenkins_http_port }}'
+      notify:
+        - Reiniciar servicio Jenkins
+
+  handlers:
+    - name: Reiniciar servicio Jenkins
+      systemd:
+        name: jenkins
+        state: restarted
