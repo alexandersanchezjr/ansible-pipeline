@@ -17,51 +17,8 @@
         name: nginx
         state: started
         enabled: yes
-        
-- name: Instalar y configurar Jenkins
-  hosts: jenkins
-  become: true
-  vars:
-    jenkins_apt_repo_url: "https://pkg.jenkins.io/debian-stable"
-    jenkins_http_port: "80"
 
-  tasks:
-    - name: Agregar repositorio de Jenkins al sistema de paquetes
-      apt_repository:
-        repo: "deb {{ jenkins_apt_repo_url }} binary/"
-
-    - name: Actualizar cache de paquetes
-      apt:
-        update_cache: yes
-
-    - name: Instalar Jenkins
-      apt:
-        name: jenkins
-        state: present
-        allow_unauthenticated: yes
-
-    - name: Iniciar servicio de Jenkins
-      systemd:
-        name: jenkins
-        state: started
-        enabled: yes
-    
-    - name: Cambiar puerto de Jenkins
-      lineinfile:
-        path: /etc/default/jenkins
-        regexp: 'HTTP_PORT='
-        line: 'HTTP_PORT={{ jenkins_http_port }}'
-      notify:
-        - Reiniciar servicio Jenkins
-
-  handlers:
-    - name: Reiniciar servicio Jenkins
-      systemd:
-        name: jenkins
-        state: restarted
-
-
-- name: Instalar Jenkins en Ubuntu
+- name: Instalar Jenkins y Configurar Jenkins
   hosts: jenkins
   become: yes
   vars:
@@ -100,16 +57,19 @@
       apt:
         name: jenkins
         state: present
-      notify:
-        - start jenkins
-  
-    - name: Cambiar puerto de Jenkins
+        
+    - name: Detener el servicio de Jenkins
+      systemd:
+        name: jenkins
+        state: stopped
+
+    - name: Cambiar el puerto de Jenkins a 80
       lineinfile:
         path: /etc/default/jenkins
-        regexp: 'HTTP_PORT='
-        line: 'HTTP_PORT={{ jenkins_http_port }}'
+        regexp: "^HTTP_PORT=.*"
+        line: "HTTP_PORT=80"
       notify:
-        - restart jenkins
+        - start jenkins
 
   handlers:
     - name: start jenkins
@@ -117,8 +77,3 @@
         name: jenkins
         state: started
         enabled: yes
-
-    - name: restart jenkins
-      systemd:
-        name: jenkins
-        state: restarted
