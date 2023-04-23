@@ -38,6 +38,7 @@
       apt:
         name: jenkins
         state: present
+        allow_unauthenticated: yes
 
     - name: Iniciar servicio de Jenkins
       systemd:
