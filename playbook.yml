@@ -35,7 +35,7 @@
     - name: Instalar dependencias
       apt:
         name:
-          - openjdk-11-jdk
+          - openjdk-8-jdk
           - apt-transport-https
           - ca-certificates
           - curl
