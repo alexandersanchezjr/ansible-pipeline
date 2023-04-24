@@ -18,62 +18,60 @@
         state: started
         enabled: yes
 
-- name: Instalar Jenkins y Configurar Jenkins
+- name: Instalación de Docker y Docker Compose en Ubuntu
   hosts: jenkins
-  become: yes
-  vars:
-    jenkins_hostname: jenkins.example.com
-    jenkins_admin_username: admin
-    jenkins_admin_password: admin
-
+  become: true
+  
   tasks:
-    - name: Actualizar repositorios
+    # Actualizar el cache de paquetes
+    - name: Actualizar el cache de paquetes
       apt:
         update_cache: yes
-        cache_valid_time: 3600
 
-    - name: Instalar dependencias
+    # Instalar dependencias para Docker
+    - name: Instalar dependencias para Docker
       apt:
-        name:
-          - openjdk-8-jdk
+        name: 
           - apt-transport-https
           - ca-certificates
           - curl
-          - gnupg
-          - lsb-release
+          - gnupg-agent
+          - software-properties-common
+
+    # Agregar la clave GPG oficial de Docker
+    - name: Agregar la clave GPG oficial de Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: Añadir clave GPG de Jenkins
-      ansible.builtin.apt_key:
-        url: https://pkg.jenkins.io/debian/jenkins.io.key
+    # Agregar el repositorio de Docker al sources.list.d
+    - name: Agregar el repositorio de Docker al sources.list.d
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
         state: present
 
-    - name: Añadir repositorio de Jenkins
-      ansible.builtin.apt_repository:
-        repo: "deb https://pkg.jenkins.io/debian binary/"
-        state: present
-
-    - name: Instalar Jenkins
+    # Actualizar el cache de paquetes de nuevo (para que encuentre el paquete de Docker)
+    - name: Actualizar el cache de paquetes de nuevo (para que encuentre el paquete de Docker)
       apt:
-        name: jenkins
+        update_cache: yes
+
+    # Instalar Docker
+    - name: Instalar Docker
+      apt:
+        name: docker-ce
         state: present
 
-    - name: Detener el servicio de Jenkins
-      systemd:
-        name: jenkins
-        state: stopped
+    # Añadir el usuario actual al grupo de Docker
+    - name: Añadir el usuario actual al grupo de Docker
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
 
-    - name: Cambiar el puerto de Jenkins a 80
-      lineinfile:
-        path: /etc/default/jenkins
-        regexp: "^HTTP_PORT=.*"
-        line: "HTTP_PORT=80"
-      notify:
-        - start jenkins
-
-  handlers:
-    - name: start jenkins
-      systemd:
-        name: jenkins
-        state: started
-        enabled: yes
+    # Instalar Docker Compose
+    - name: Instalar Docker Compose
+      shell: |
+        curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+      args:
+        creates: /usr/local/bin/docker-compose
