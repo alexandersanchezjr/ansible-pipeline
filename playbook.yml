@@ -79,13 +79,13 @@
     - name: Copiar archivo de configuración de Nginx
       copy:
         src: docker-compose.yml
-        dest: docker-compose.yml
+        dest: /home/{{ ansible_user }}/docker-compose.yml
 
     # Ejecutar un archivo docker-compose.yml
     - name: Ejecutar docker-compose.yml
       command: docker-compose up -d
       args:
-        chdir: docker-compose.yml
+        chdir: /home/{{ ansible_user }}/docker-compose.yml
       become_user: "{{ ansible_user }}"
       become_method: su
 
