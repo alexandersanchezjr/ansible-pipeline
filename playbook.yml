@@ -75,3 +75,28 @@
         chmod +x /usr/local/bin/docker-compose
       args:
         creates: /usr/local/bin/docker-compose
+    
+    - name: Copiar archivo de configuración de Nginx
+      copy:
+        src: docker-compose.yml
+        dest: docker-compose.yml
+
+    # Ejecutar un archivo docker-compose.yml
+    - name: Ejecutar docker-compose.yml
+      command: docker-compose up -d
+      args:
+        chdir: docker-compose.yml
+      become_user: "{{ ansible_user }}"
+      become_method: su
+
+    - name: Instalar plugins jenkins
+      command: docker exec -it jenkins jenkins-plugin-cli --plugin-file /plugins.txt
+      become_user: "{{ ansible_user }}"
+      become_method: su
+      notify: restart jenkins
+
+  handlers:
+    - name: restart jenkins
+      command: sudo docker restart jenkins
+      become_user: "{{ ansible_user }}"
+      become_method: su
