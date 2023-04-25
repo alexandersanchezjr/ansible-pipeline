@@ -18,6 +18,13 @@
         state: started
         enabled: yes
 
+    - name: Cambiar propietario de /var/www/html
+      file:
+        path: /var/www/html
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        recurse: yes
+
 - name: Instalación de Docker y Docker Compose en Ubuntu
   hosts: jenkins
   become: true
