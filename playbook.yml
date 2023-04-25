@@ -93,17 +93,17 @@
       command: docker-compose up -d
       args:
         chdir: /home/{{ ansible_user }}/
-      become_user: "{{ ansible_user }}"
+      become_user: "root"
       become_method: su
 
     - name: Instalar plugins jenkins
       command: docker exec -it jenkins jenkins-plugin-cli --plugin-file /plugins.txt
-      become_user: "{{ ansible_user }}"
+      become_user: "root"
       become_method: su
       notify: restart jenkins
 
   handlers:
     - name: restart jenkins
       command: sudo docker restart jenkins
-      become_user: "{{ ansible_user }}"
+      become_user: "root"
       become_method: su
