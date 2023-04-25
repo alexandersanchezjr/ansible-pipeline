@@ -1,7 +1,7 @@
 version: "3"
 services:
   jenkins:
-    image: madmilodz/jenkinsci:latest
+    image: madmilodz/jenkinsci:v2
     container_name: jenkins
     environment:
       - DOCKER_HOST=tcp://localhost:2375
